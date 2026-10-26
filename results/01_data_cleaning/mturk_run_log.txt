@@ -1,0 +1,55 @@
+1. Raw data
+Rows: 12,838 (implied by paper: 12,838)
+Missing scores: 2,116
+Finished == 1: 10,889
+Approved == 1: 10,498
+Recognized treatments: 12,401
+Date range: 2015-05-15 14:58:11 to 2015-06-05 16:59:41
+
+2. Outage window
+Window: 2015-05-18 15:36:15 to 2015-05-19 10:54:04
+Rows in scan window: 720
+Rows removed: 720
+Missing-score rate inside / outside: 79.4% / 12.7%
+
+3. Repeated IDs
+IDs: 140, rows flagged: 374
+
+4. Exclusions
+                               Step  Dropped  Remaining  Paper  Diff
+                         Raw sample        0      12838   <NA>  <NA>
+           Inferred outage interval      720      12118    721    -1
+                   Score above 4000       48      12070     48     0
+      Not completed (finished != 1)     1733      10337   1543   190
+ Repeated ID among assigned records      133      10204    364  -231
+Unapproved HIT or missing worker ID      200      10004    187    13
+       Missing or nonpositive score      137       9867    114    23
+     Missing/unrecognized treatment        4       9863   <NA>  <NA>
+
+Final sample: 9,863 (paper: 9,861, diff: +2)
+
+5. By treatment
+           count     mean     std    sem
+treatment                               
+1.1          558  2029.44  648.89  27.47
+1.2          567  2175.25  577.43  24.25
+1.3          540  1520.68  725.65  31.23
+1.4          562  2131.86  626.23  26.42
+2.0          538  1883.19  663.64  28.61
+3.1          554  1906.99  632.07  26.85
+3.2          549  1918.42  607.59  25.93
+4.1          544  2004.21  638.69  27.38
+4.2          550  1970.37  672.50  28.68
+5.1          546  2135.74  575.14  24.61
+5.2          532  2154.77  532.49  23.09
+5.3          532  2187.86  530.21  22.99
+6.1          555  1895.54  669.92  28.44
+6.2          568  1977.14  589.47  24.73
+7.0          526  1848.37  737.20  32.14
+8.0          543  1761.29  713.82  30.63
+9.0          554  1739.54  676.90  28.76
+10.0         545  1601.90  694.92  29.77
+
+18 treatments, 9,863 obs
+
+Outputs saved to /Users/apple/Desktop/replication
