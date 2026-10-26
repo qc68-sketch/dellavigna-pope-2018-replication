@@ -1,5 +1,8 @@
 #%% Setup
-"""Replicate Table 3 and Table 5, Panels A and B, in DellaVigna and Pope (2018)."""
+"""Replication of DellaVigna and Pope (2018): Table 3 and Table 5, Panels A and B.
+
+Uses the authors' cleaned worker and expert data.
+"""
 from datetime import datetime
 from pathlib import Path
 
@@ -8,20 +11,17 @@ import pandas as pd
 from scipy.optimize import brentq, least_squares
 from scipy.stats import norm
 
-# I save the results in the desktop project folder, wherever I run this script.
-ROOT = Path.home() / "Desktop" / "replication"
 DATA_FOLDER = Path.home() / "Downloads/supplementary/CodeForPosting/dtafiles"
-OUTPUT_FOLDER = ROOT / "Result" / "main_results"
+OUTPUT_FOLDER = Path.home() / "Desktop" / "replication" / "main_results"
 CHECK_FOLDER = OUTPUT_FOLDER / "checks"
 LOG_FILE = OUTPUT_FOLDER / "main_results.log"
 
 BOOTSTRAP_DRAWS = 1000
 RANDOM_SEED = 20261026
-NORMAL_GRID = 200_000  # normal baseline quantiles
+NORMAL_GRID = 200_000  # grid size for the normal baseline (discrete pay)
 METHODS = ["Power MD", "Power NLS", "Exponential MD", "Exponential NLS"]
 EXPERT_METHODS = ["Power MD", "Exponential MD", "Exponential NLS"]
 
-# Treatments
 TREATMENT_CODES = [1.3, 1.1, 1.2, 1.4, 2.0, 3.1, 3.2, 10.0, 4.1, 4.2,
                    5.1, 5.2, 5.3, 6.1, 6.2, 7.0, 8.0, 9.0]
 TREATMENT_NAMES = ["No pay", "1 cent / 100", "10 cents / 100", "4 cents / 100",
@@ -29,14 +29,14 @@ TREATMENT_NAMES = ["No pay", "1 cent / 100", "10 cents / 100", "4 cents / 100",
                    "Delay 2 weeks", "Delay 4 weeks", "Gain 40 cents", "Loss 40 cents",
                    "Gain 80 cents", "Probability 1%", "Probability 50%",
                    "Social comparison", "Ranking", "Task significance"]
-# Forecast column numbers; None means no forecast.
+# Expert forecast column for each treatment (None = not forecast)
 EXPERT_COLUMNS = [None, None, None, 4, 5, 6, 7, 18, 8, 9,
                   10, 11, 12, 13, 14, 15, 16, 17]
 
-BENCHMARK_CODES = [1.3, 1.1, 1.2]
-BEHAVIOR_CODES = [3.1, 3.2, 10.0, 4.1, 4.2]
+BENCHMARK_CODES = [1.3, 1.1, 1.2]              # no pay, 1 cent, 10 cents
+BEHAVIOR_CODES = [3.1, 3.2, 10.0, 4.1, 4.2]    # charity (2), gift exchange, delay (2)
 MODEL_CODES = BENCHMARK_CODES + BEHAVIOR_CODES
-PIECE_RATES = np.array([0.0, 0.01, 0.10])
+PIECE_RATES = np.array([0.0, 0.01, 0.10])      # dollars per 100 points
 BEHAVIOR_NAMES = ["alpha", "warm_glow", "gift_shift", "beta", "delta"]
 EXPERT_FORECASTS = [f"treatment_t{EXPERT_COLUMNS[TREATMENT_CODES.index(code)]}"
                     for code in BEHAVIOR_CODES]
@@ -65,9 +65,7 @@ def start_table(name):
 def save_table(table, name, title):
     log_print(f"\n{title}")
     log_print(table.to_string(index=False))
-    output_file = OUTPUT_FOLDER / f"{name}.csv"
-    table.to_csv(output_file, index=False)
-    log_print(f"Saved: {output_file}")
+    table.to_csv(OUTPUT_FOLDER / f"{name}.csv", index=False)
 
 
 def show_nls_check(method, fit):
@@ -82,17 +80,24 @@ def show_bootstrap_check(estimates):
 
 
 #%% Model functions
-# Benchmark: effort for exponential costs, log effort for power costs.
+# Benchmark model
 def solve_benchmark(means):
-    """Solve for (log gamma, log k, log s) using the three benchmark means."""
+    """Solve for (log gamma, log k, log s) from the three benchmark moments.
+
+    Each moment y satisfies gamma * y = log(s + p) - log(k), where y is
+    effort (exponential costs) or log effort (power costs). Power MD uses
+    log(mean effort); power NLS uses mean(log rounded effort).
+    """
     y0, y1, y10 = means
     if y1 <= y0:
         raise ValueError("Benchmark means do not admit a positive interior solution.")
+    # With s > 0, the model implies this ratio lies strictly between 1 and
+    # 0.10 / 0.01 = 10; outside that range there is no interior solution.
     ratio = (y10 - y0) / (y1 - y0)
     if not 1 < ratio < 10:
         raise ValueError("Benchmark ratio is outside the interior parameter domain.")
 
-    # Use log s for stability when s is small.
+    # Eliminating gamma and k leaves one equation in log(s).
     def gap(log_s):
         one_cent = np.logaddexp(log_s, np.log(0.01)) - log_s
         ten_cents = np.logaddexp(log_s, np.log(0.10)) - log_s
@@ -110,7 +115,6 @@ def benchmark_prediction(theta, piece_rates):
 
 
 def md_moments(groups, power):
-    # Power MD uses log(mean effort); power NLS uses mean(log rounded effort).
     means = np.array([effort.mean() for effort in groups])
     return np.log(means) if power else means
 
@@ -133,6 +137,9 @@ def implied_motivation(theta, moments):
 
 
 def social_parameters(motivation, s):
+    """Charity: motivation = s + alpha * c + 0.01 * warm_glow (c = 0.01, 0.10).
+    Gift exchange: motivation = s + gift_shift.
+    """
     charity_one, charity_ten, gift = motivation[:3]
     alpha = (charity_ten - charity_one) / 0.09
     warm_glow = (charity_one - s - 0.01 * alpha) / 0.01
@@ -140,7 +147,10 @@ def social_parameters(motivation, s):
 
 
 def time_parameters(motivation, s):
-    """Recover beta and delta; return NaN if delay returns are nonpositive."""
+    """Delay: motivation = s + 0.01 * beta * delta**t, with t = 2 or 4 weeks.
+
+    Returns NaN when the delay means imply no positive solution.
+    """
     two_weeks, four_weeks = motivation[3] - s, motivation[4] - s
     if two_weeks <= 0 or four_weeks <= 0:
         return np.nan, np.nan
@@ -150,6 +160,8 @@ def time_parameters(motivation, s):
 
 
 def behavioral_parameters(theta, moments):
+    """Workers' parameters. Raises instead of returning NaN, so that the
+    bootstrap skips draws without a solution."""
     s = np.exp(theta[2])
     motivation = implied_motivation(theta, moments)
     beta, delta = time_parameters(motivation, s)
@@ -171,8 +183,7 @@ def parameter_vector(means):
 def joint_prediction(theta):
     """Predict group means from log parameters.
 
-    Order: gamma, k, s, three motivations, beta, delta.
-    The benchmark uses the first three parameters.
+    Order: gamma, k, s, motivations (charity 1, charity 10, gift), beta, delta.
     """
     benchmark = benchmark_prediction(theta[:3], PIECE_RATES)
     if len(theta) == 3:
@@ -193,6 +204,7 @@ def fit_nls(outcomes):
     means = np.array([y.mean() for y in outcomes])
     counts = np.array([len(y) for y in outcomes])
 
+    # Start from the exact solution at the observed group means.
     start = solve_benchmark(means[:3])
     if len(outcomes) == 8:
         gamma = np.exp(start[0])
@@ -255,7 +267,12 @@ def bootstrap_md(groups, draws, seed):
 
 # Discrete-pay predictions and expert beliefs
 def discrete_prediction(baseline_effort, gamma, s):
-    """Choose effort from the baseline, zero, pay thresholds, and cap."""
+    """Mean effort when pay is discrete (one payment at each threshold).
+
+    Each worker compares staying at baseline effort with moving to zero, a
+    payment threshold or the cap. Cost is normalized so that marginal cost
+    at the worker's baseline equals s.
+    """
     n = len(baseline_effort)
     corners = [0.0] + PAY_THRESHOLDS + [EFFORT_CAP]
     candidates = np.column_stack([np.clip(baseline_effort, 0, EFFORT_CAP)]
@@ -286,9 +303,6 @@ def expert_parameters(experts, theta, power):
 
 #%% Load data
 start_table("Data checks")
-log_print(f"Data folder: {DATA_FOLDER}")
-log_print(f"Results folder: {OUTPUT_FOLDER}")
-log_print(f"Log file: {LOG_FILE}")
 workers = pd.read_stata(DATA_FOLDER / "MTurkCleanedDataShort.dta")
 experts = pd.read_stata(DATA_FOLDER / "ExpertForecastCleanWide.dta")
 workers["code"] = pd.to_numeric(workers["treatment"].astype(str)).round(1)
@@ -301,7 +315,7 @@ forecast_columns = [f"treatment_t{i}" for i in range(4, 19)]
 if experts[forecast_columns].isna().any().any() or experts["id"].duplicated().any():
     raise ValueError("Expected complete forecasts and unique expert IDs.")
 
-# Group order: three benchmark treatments, then five behavioral treatments.
+# Groups in model order: three benchmark, then five behavioral treatments
 groups = [workers.loc[workers["code"] == code, "buttonpresses"].to_numpy(float)
           for code in MODEL_CODES]
 
@@ -350,6 +364,7 @@ for code, effort in zip(BENCHMARK_CODES, groups[:3]):
                         "Mean log rounded effort (power NLS)": np.log(rounded).mean()})
 log_print(pd.DataFrame(moment_rows).to_string(index=False))
 
+# Point estimates
 fits = {}
 for method in METHODS:
     power = method.startswith("Power")
@@ -360,7 +375,7 @@ for method in METHODS:
         fits[method] = fit_nls(rounded_outcomes(groups[:3], power))
         show_nls_check(method, fits[method])
 
-# SEs: bootstrap for MD, delta method for NLS.
+# Standard errors: bootstrap for MD, delta method for NLS
 boot_a = bootstrap_md(groups[:3], BOOTSTRAP_DRAWS, RANDOM_SEED)
 show_bootstrap_check(boot_a)
 
@@ -376,10 +391,12 @@ for method in METHODS:
                                "SE": se[j], "N": sum(map(len, groups[:3]))})
 table5a_parameters = pd.DataFrame(parameter_rows)
 
-# Predict effort in the two remaining pay treatments.
+# Predictions for the two remaining pay treatments
 prediction_rows = []
 for method in METHODS:
     predictions = benchmark_prediction(fits[method]["theta"], np.array([0.04, 0.001]))
+    # Power MD predicts log(mean effort); power NLS predicts mean(log effort),
+    # which cannot be converted back to points, so it stays in logs.
     if method == "Power MD":
         predictions = np.exp(predictions)
     unit = "Mean log rounded effort" if method == "Power NLS" else "Points"
@@ -387,9 +404,11 @@ for method in METHODS:
         prediction_rows.append({"Method": method, "Treatment": treatment,
                                 "Prediction": value, "Unit": unit})
 
-# Discrete pay using exponential NLS (Appendix A)
+# Discrete-pay prediction using exponential NLS (Appendix A)
 exp_nls = fits["Exponential NLS"]
-gamma, k, s = np.exp(exp_nls["theta"])
+gamma, _, s = np.exp(exp_nls["theta"])
+# Baseline (no-pay) effort: normal around the predicted mean, or the
+# observed no-pay group.
 mean_baseline = benchmark_prediction(exp_nls["theta"], np.array([0.0]))[0]
 quantiles = (np.arange(NORMAL_GRID) + 0.5) / NORMAL_GRID
 baselines = {"Normal": mean_baseline + exp_nls["sigma"] * norm.ppf(quantiles),
@@ -408,11 +427,13 @@ save_table(table5a_predictions, "table5a_predictions", "Table 5 Panel A: predict
 #%% Table 5 Panel B: worker preferences and expert beliefs
 start_table("Table 5 Panel B: worker preferences and expert beliefs")
 
+# Estimation groups
 group_rows = [{"Treatment code": code, "N": len(effort), "Mean effort": effort.mean()}
               for code, effort in zip(MODEL_CODES, groups)]
 log_print(pd.DataFrame(group_rows).to_string(index=False))
 log_print(f"Joint estimation sample: {sum(map(len, groups)):,}")
 
+# Point estimates (re-estimated so this cell runs without Panel A)
 estimates = {}
 for method in METHODS:
     power = method.startswith("Power")
@@ -426,6 +447,7 @@ for method in METHODS:
         estimates[method] = {"theta": fit["theta"], "behavior": fit["parameters"][3:],
                              "se": fit["se"][3:]}
 
+# 95% CIs: percentile bootstrap for MD, normal approximation for NLS
 boot_b = bootstrap_md(groups, BOOTSTRAP_DRAWS, RANDOM_SEED)
 show_bootstrap_check(boot_b)
 
@@ -446,6 +468,7 @@ for method in METHODS:
                             "N": sum(map(len, groups))})
 table5b_workers = pd.DataFrame(worker_rows)
 
+# Expert beliefs: parameters implied by each forecast
 expert_rows = []
 for method in EXPERT_METHODS:
     individual = expert_parameters(experts, estimates[method]["theta"],
@@ -465,21 +488,4 @@ log_print("Experts without a beta/delta solution are kept for the social paramet
 save_table(table5b_workers, "table5b_workers", "Table 5 Panel B: workers (95% CI)")
 save_table(table5b_experts, "table5b_experts", "Table 5 Panel B: experts (median, quartiles)")
 
-
-# I check that the five result tables and the log have been saved.
-result_files = [
-    "table3.csv",
-    "table5a_parameters.csv",
-    "table5a_predictions.csv",
-    "table5b_workers.csv",
-    "table5b_experts.csv",
-    "main_results.log",
-]
-log_print("\nFinished. Main results saved to:")
-log_print(OUTPUT_FOLDER)
-for filename in result_files:
-    if not (OUTPUT_FOLDER / filename).is_file():
-        raise FileNotFoundError(f"Expected output was not saved: {filename}")
-    log_print(f"  {filename}")
-log_print(f"Individual expert estimates saved separately to: {CHECK_FOLDER}")
-
+log_print(f"\nOutputs saved to {OUTPUT_FOLDER}")
