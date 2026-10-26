@@ -1,9 +1,0 @@
-Step,Dropped,Remaining,Paper,Diff
-Raw sample,0,12838,,
-Inferred outage interval,720,12118,721,-1
-Score above 4000,48,12070,48,0
-Not completed (finished != 1),1733,10337,1543,190
-Repeated ID among assigned records,133,10204,364,-231
-Unapproved HIT or missing worker ID,200,10004,187,13
-Missing or nonpositive score,137,9867,114,23
-Missing/unrecognized treatment,4,9863,,
