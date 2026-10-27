@@ -1,0 +1,141 @@
+DellaVigna and Pope (2018): main results
+
+========================================================================
+Data checks | 2026-10-27 02:02:00
+========================================================================
+Workers: 9,861; experts: 208
+Treatments: 18
+Bootstrap draws: 1000; seed: 20261026
+
+========================================================================
+Table 3: effort and expert forecasts | 2026-10-27 02:02:03
+========================================================================
+Sum of treatment Ns: 9,861 (worker sample: 9,861)
+Treatment N range: 526 to 568
+Experts per forecast treatment: 208 to 208
+
+Table 3
+        Treatment   N  Mean effort  SE effort  Expert N  Mean forecast  SD forecast  Actual minus forecast  SE difference
+           No pay 540  1520.679630  31.226965       NaN            NaN          NaN                    NaN            NaN
+     1 cent / 100 558  2029.444444  27.469871       NaN            NaN          NaN                    NaN            NaN
+   10 cents / 100 566  2174.618375  24.284571       NaN            NaN          NaN                    NaN            NaN
+    4 cents / 100 562  2131.857651  26.416065     208.0    2056.509615   120.866077              75.348036      27.713574
+    1 cent / 1000 538  1883.193309  28.611718     208.0    1657.432692   262.003495             225.760616      33.891864
+   Charity 1 cent 554  1906.994585  26.853956     208.0    1893.600962   202.200406              13.393623      30.293522
+ Charity 10 cents 549  1918.415301  25.931157     208.0    1996.586538   196.746587             -78.171238      29.300630
+    Gift exchange 545  1601.899083  29.767102     208.0    1709.461538   207.124781            -107.562456      33.050471
+    Delay 2 weeks 544  2004.205882  27.383624     208.0    1932.668269   142.027522              71.537613      29.100563
+    Delay 4 weeks 550  1970.365455  28.675460     208.0    1895.192308   162.541267              75.173147      30.810706
+    Gain 40 cents 545  2135.952294  24.658140     208.0    1955.288462   149.900268             180.663832      26.759170
+    Loss 40 cents 532  2154.772556  23.086543     208.0    2002.471154   143.570478             152.301403      25.141340
+    Gain 80 cents 532  2187.857143  22.987474     208.0    2007.211538   131.934303             180.645604      24.740853
+   Probability 1% 555  1895.538739  28.436604     208.0    1966.692308   253.430248             -71.153569      33.427886
+  Probability 50% 568  1977.144366  24.733708     208.0    1941.384615   179.271651              35.759751      27.681537
+Social comparison 526  1848.365019  32.143292     208.0    1877.346154   209.483251             -28.981135      35.272770
+          Ranking 543  1761.292818  30.633090     208.0    1849.884615   234.282265             -88.591798      34.673789
+Task significance 554  1739.536101  28.758922     208.0    1756.942308   230.154824             -17.406207      32.889893
+
+========================================================================
+Table 5 Panel A: benchmark parameters and predictions | 2026-10-27 02:02:07
+========================================================================
+ Treatment code   N  Mean effort (MD)  Mean rounded effort (exp. NLS)  Mean log rounded effort (power NLS)
+            1.3 540       1520.679630                     1521.898148                             7.101474
+            1.1 558       2029.444444                     2026.747312                             7.521130
+            1.2 566       2174.618375                     2173.939929                             7.629402
+Power NLS: N = 1,664, sigma = 0.635, max fitted-mean error = 2.7e-15
+Exponential NLS: N = 1,664, sigma = 653.578, max fitted-mean error = 0.0e+00
+Power MD bootstrap: 1000/1000 draws with an interior solution
+Exponential MD bootstrap: 1000/1000 draws with an interior solution
+
+Table 5 Panel A: parameters
+         Method Parameter      Estimate           SE    N
+       Power MD     gamma  3.332593e+01 2.155057e+01 1664
+       Power MD         k 6.006424e-113 1.896472e-63 1664
+       Power MD         s  6.652361e-07 1.017805e-05 1664
+      Power NLS     gamma  2.126565e+01 5.636730e+00 1664
+      Power NLS         k  3.453298e-72 1.477399e-70 1664
+      Power NLS         s  1.331360e-06 3.836080e-06 1664
+ Exponential MD     gamma  1.585893e-02 1.020164e-02 1664
+ Exponential MD         k  1.053048e-16 1.690234e-11 1664
+ Exponential MD         s  3.133618e-06 2.454642e-05 1664
+Exponential NLS     gamma  1.564107e-02 3.908893e-03 1664
+Exponential NLS         k  1.709268e-16 1.410306e-15 1664
+Exponential NLS         s  3.722260e-06 8.806828e-06 1664
+
+Table 5 Panel A: predicted effort
+                              Method     Treatment  Prediction                    Unit
+                            Power MD 4 cents / 100 2115.642731                  Points
+                            Power MD 1 cent / 1000 1893.992697                  Points
+                           Power NLS 4 cents / 100    7.586315 Mean log rounded effort
+                           Power NLS 1 cent / 1000    7.412909 Mean log rounded effort
+                      Exponential MD 4 cents / 100 2116.843748                  Points
+                      Exponential MD 1 cent / 1000 1884.430262                  Points
+                     Exponential NLS 4 cents / 100 2115.361146                  Points
+                     Exponential NLS 1 cent / 1000 1879.747025                  Points
+   Exponential NLS discrete (Normal) 1 cent / 1000 1664.330517                  Points
+Exponential NLS discrete (Empirical) 1 cent / 1000 1651.294444                  Points
+
+========================================================================
+Table 5 Panel B: worker preferences and expert beliefs | 2026-10-27 02:02:11
+========================================================================
+ Treatment code   N  Mean effort
+            1.3 540  1520.679630
+            1.1 558  2029.444444
+            1.2 566  2174.618375
+            3.1 554  1906.994585
+            3.2 549  1918.415301
+           10.0 545  1601.899083
+            4.1 544  2004.205882
+            4.2 550  1970.365455
+Joint estimation sample: 4,406
+Power NLS: N = 4,406, sigma = 0.592, max fitted-mean error = 2.7e-15
+Exponential NLS: N = 4,406, sigma = 651.376, max fitted-mean error = 0.0e+00
+Power MD bootstrap: 999/1000 draws with an interior solution
+Exponential MD bootstrap: 999/1000 draws with an interior solution
+Power MD: 208 experts, 199 with a positive beta/delta solution
+Exponential MD: 208 experts, 199 with a positive beta/delta solution
+Exponential NLS: 208 experts, 199 with a positive beta/delta solution
+Experts without a beta/delta solution are kept for the social parameters.
+
+Table 5 Panel B: workers (95% CI)
+         Method  Parameter  Estimate        SE        CI low  CI high    N
+       Power MD      alpha  0.003075  0.013213 -2.379073e-02 0.034378 4406
+       Power MD  warm_glow  0.122550  0.154556  1.133529e-03 0.601990 4406
+       Power MD gift_shift  0.000003  0.000025  1.887343e-16 0.000071 4406
+       Power MD       beta  1.162415 15.192622  5.512272e-02 9.579934 4406
+       Power MD      delta  0.752925  0.347334  3.168803e-01 1.536727 4406
+      Power NLS      alpha  0.013078  0.024856 -3.563905e-02 0.061796 4406
+      Power NLS  warm_glow  0.259181  0.252554 -2.358154e-01 0.754178 4406
+      Power NLS gift_shift  0.000012  0.000027 -4.078629e-05 0.000065 4406
+      Power NLS       beta  1.606190  1.806835 -1.935142e+00 5.147523 4406
+      Power NLS      delta  0.748825  0.257809  2.435282e-01 1.254122 4406
+ Exponential MD      alpha  0.003165  0.013128 -2.390682e-02 0.033946 4406
+ Exponential MD  warm_glow  0.139994  0.158302  2.044395e-03 0.621058 4406
+ Exponential MD gift_shift  0.000008  0.000039  9.951531e-15 0.000120 4406
+ Exponential MD       beta  1.146363 11.349877  6.399853e-02 8.389515 4406
+ Exponential MD      delta  0.764523  0.326848  3.323499e-01 1.496658 4406
+Exponential NLS      alpha  0.003666  0.010835 -1.757005e-02 0.024902 4406
+Exponential NLS  warm_glow  0.142675  0.140188 -1.320885e-01 0.417439 4406
+Exponential NLS gift_shift  0.000009  0.000019 -2.739241e-05 0.000046 4406
+Exponential NLS       beta  1.236820  1.293645 -1.298678e+00 3.772318 4406
+Exponential NLS      delta  0.754195  0.240174  2.834634e-01 1.224927 4406
+
+Table 5 Panel B: experts (median, quartiles)
+         Method  Parameter   Median           Q25      Q75   N
+       Power MD      alpha 0.066840  1.611466e-03 0.528610 208
+       Power MD  warm_glow 0.019682 -1.105870e-03 0.702850 208
+       Power MD gift_shift 0.000012  9.780122e-07 0.000216 208
+       Power MD       beta 0.763119  3.057679e-01 1.180533 199
+       Power MD      delta 0.845857  6.129324e-01 0.976007 199
+ Exponential MD      alpha 0.066837  2.147410e-03 0.537954 208
+ Exponential MD  warm_glow 0.028121 -3.019060e-04 0.690265 208
+ Exponential MD gift_shift 0.000026  2.949445e-06 0.000300 208
+ Exponential MD       beta 0.770370  3.200079e-01 1.172995 199
+ Exponential MD      delta 0.853268  6.383597e-01 0.976488 199
+Exponential NLS      alpha 0.069967  2.268207e-03 0.538969 208
+Exponential NLS  warm_glow 0.033550  4.176241e-05 0.723701 208
+Exponential NLS gift_shift 0.000030  3.302765e-06 0.000328 208
+Exponential NLS       beta 0.806451  3.391029e-01 1.220886 199
+Exponential NLS      delta 0.855120  6.422503e-01 0.976806 199
+
+Outputs saved to /Users/apple/Desktop/replication/main_results

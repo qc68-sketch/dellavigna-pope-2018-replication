@@ -1,0 +1,11 @@
+Method,Treatment,Prediction,Unit
+Power MD,4 cents / 100,2115.6427314677017,Points
+Power MD,1 cent / 1000,1893.9926971477096,Points
+Power NLS,4 cents / 100,7.5863149760366895,Mean log rounded effort
+Power NLS,1 cent / 1000,7.412909439363411,Mean log rounded effort
+Exponential MD,4 cents / 100,2116.843747780796,Points
+Exponential MD,1 cent / 1000,1884.4302621279444,Points
+Exponential NLS,4 cents / 100,2115.3611458999994,Points
+Exponential NLS,1 cent / 1000,1879.747025014686,Points
+Exponential NLS discrete (Normal),1 cent / 1000,1664.3305170445665,Points
+Exponential NLS discrete (Empirical),1 cent / 1000,1651.2944444444445,Points
