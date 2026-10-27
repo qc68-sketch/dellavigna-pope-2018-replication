@@ -199,7 +199,7 @@ def fit_nls(outcomes):
     """Fit NLS to rounded effort (log effort for power costs).
 
     The model is exactly identified and fits the group means.
-    Standard errors use the delta method.
+    Standard errors use the delta method with HC1 robust variances.
     """
     means = np.array([y.mean() for y in outcomes])
     counts = np.array([len(y) for y in outcomes])
@@ -230,12 +230,16 @@ def fit_nls(outcomes):
     # Delta method: derivatives with respect to group means.
     jacobian = np.zeros((n_par, n_par))
     for j in range(n_par):
-        step = max(abs(means[j]), 1.0) * 1e-5
+        step = max(abs(means[j]), 1.0) * 1e-7
         up, down = means.copy(), means.copy()
         up[j] += step
         down[j] -= step
         jacobian[:, j] = (parameter_vector(up) - parameter_vector(down)) / (2 * step)
-    covariance = jacobian @ np.diag(variance / counts) @ jacobian.T
+    # HC1 allows residual variance to differ across treatments.
+    group_sse = np.array([((y - fitted_means[j])**2).sum()
+                          for j, y in enumerate(outcomes)])
+    mean_variance = (n / (n - n_par)) * group_sse / counts**2
+    covariance = jacobian @ np.diag(mean_variance) @ jacobian.T
 
     return {"theta": solve_benchmark(fitted_means[:3]),
             "parameters": parameter_vector(fitted_means),
